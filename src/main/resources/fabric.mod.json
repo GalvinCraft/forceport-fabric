@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "force-port",
+	"version": "${version}",
+	"name": "Force Port",
+	"description": "A mod that forces the port to always be the same when using the \"Open To LAN\" feature!",
+	"authors": [
+		"GalvinPython"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/forceport",
+		"sources": "https://github.com/GalvinCraft/forceport-fabric"
+	},
+	"license": "MIT",
+	"icon": "assets/force-port/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"me.imgalvin.forceport.ForcePort"
+		]
+	},
+	"mixins": [
+		"force-port.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"java": ">=21"
+	}
+}
