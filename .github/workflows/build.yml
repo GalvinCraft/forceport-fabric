@@ -71,6 +71,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/libs/*.jar
-        asset_name: build/libs/*.jar
+        asset_path: build/libs/*
+        asset_name: $(basename build/libs/*)
         asset_content_type: application/java-archive
