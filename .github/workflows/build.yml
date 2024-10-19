@@ -2,6 +2,9 @@ name: build
 
 on: [pull_request, push]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -43,13 +46,21 @@ jobs:
         echo "MOD_VERSION=$mod_version" >> $GITHUB_ENV
         echo "ARCHIVES_BASE_NAME=$archives_base_name" >> $GITHUB_ENV
 
+    - name: create tag
+      id: create_tag
+      run: |
+        tag_name="v${{ env.MOD_VERSION }}"
+        git tag $tag_name
+        git push origin $tag_name
+        echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
+
     - name: create release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
+        tag_name: ${{ env.TAG_NAME }}
         release_name: ${{ env.ARCHIVES_BASE_NAME }} ${{ env.MOD_VERSION }}
         draft: false
         prerelease: false
