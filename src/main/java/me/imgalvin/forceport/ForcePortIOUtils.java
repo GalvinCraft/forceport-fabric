@@ -1,15 +1,24 @@
 package me.imgalvin.forceport;
 
 import net.minecraft.client.MinecraftClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ForcePortIOUtils {
+    public static final Logger LOGGER = LoggerFactory.getLogger("ForcePort");
 
     // Get the path to the Minecraft installation directory
     public static Path getMinecraftInstallationLocation() {
-        return MinecraftClient.getInstance().runDirectory.toPath();
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) {
+            LOGGER.error("MinecraftClient instance is null. Cannot determine installation location.");
+            throw new IllegalStateException("MinecraftClient instance is null.");
+        }
+        return client.runDirectory.toPath();
     }
 
     // Create a configuration file with the default port
@@ -27,8 +36,17 @@ public class ForcePortIOUtils {
                 Files.writeString(configFile, "25565");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("An error occurred while creating the configuration file.", e);
         }
+    }
+
+    // Check if the port is valid
+    public static boolean checkValidation(String portString) {
+        if (!portString.matches("\\d+")) {
+            return false;
+        }
+        int port = Integer.parseInt(portString);
+        return port > 0 && port < 65535;
     }
 
     // Read the port from the configuration file
@@ -38,10 +56,22 @@ public class ForcePortIOUtils {
 
         try {
             if (Files.exists(configFile)) {
-                return Integer.parseInt(Files.readString(configFile));
+                String portString = Files.readString(configFile).trim();
+
+                if (portString.isBlank()) {
+                    LOGGER.warn("ForcePort.txt is empty or invalid, using default 25565.");
+                    return 25565;
+                }
+
+                boolean isValid = checkValidation(portString);
+
+                if (!isValid) {
+                    LOGGER.warn("Invalid port in ForcePort.txt, using default 25565. Please check the file.");
+                }
+                return isValid ? Integer.parseInt(portString) : 25565;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("An error occurred while reading the configuration file.", e);
         }
 
         return 25565;

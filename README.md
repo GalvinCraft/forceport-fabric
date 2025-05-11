@@ -17,10 +17,17 @@ Just go to the installation location for that Minecraft instance, and open the `
 # Compatible Versions
 | Mod Version | Game Version(s) | Mod Version Title       |
 |-------------|-----------------|-------------------------|
+| 1.0.1       | 1.14+           | force-port-fabric-1.0.1 |
 | 1.0.0       | 1.14+           | force-port-fabric-1.0.0 |
 
 # Important Note
-- This mod hasn't been tested full on older Quilt versions or older mod loaders. However, this mod does work on Fabric for 1.14 and above using Mod Loader 0.16.0+ 
+- This mod hasn't been tested full on older Quilt versions or older mod loaders. However, this mod does work on Fabric for 1.14 and above using Mod Loader 0.16.0+
   - If you're using the latest Minecraft versions, you can use this mod without any issues.
 - The Fabric API is NOT required for this mod to work.
+- This mod is built with Java 21, so you need to change your Java version to 21 (or above) in the instance settings to run this mod, on any versions prior to 1.20.5.
+- As of 1.0.1, if the config file is not valid, it will default to `25565` (the default port for Minecraft servers). This is to prevent the mod from crashing. If the mod doesn't seem to work, please verify your config file!
 
+# Changelog
+## 1.0.1
+- Fixed a bug where the mod would crash if newlines were added into the `forceport.txt` file (a default feature in some Linux text editors).
+- Added a check to make sure the port is a number and is between 0 and 65535.

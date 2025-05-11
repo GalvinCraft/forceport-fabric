@@ -1,76 +1,30 @@
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
+
 name: build
-
 on: [pull_request, push]
-
-permissions:
-  contents: write
 
 jobs:
   build:
-    strategy:
-      matrix:
-        java: [21]
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-24.04
     steps:
-    - name: checkout repository
-      uses: actions/checkout@v4
-      
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v2
-      
-    - name: setup jdk ${{ matrix.java }}
-      uses: actions/setup-java@v4
-      with:
-        java-version: ${{ matrix.java }}
-        distribution: 'microsoft'
-      
-    - name: make gradle wrapper executable
-      run: chmod +x ./gradlew
-
-    - name: build
-      run: ./gradlew build
-
-    - name: capture build artifacts
-      if: ${{ matrix.java == '21' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: Artifacts
-        path: build/libs/
-      
-    - name: extract version and name
-      id: extract_vars
-      run: |
-        mod_version=$(grep 'mod_version' gradle.properties | cut -d'=' -f2)
-        archives_base_name=$(grep 'archives_base_name' gradle.properties | cut -d'=' -f2)
-        echo "MOD_VERSION=$mod_version" >> $GITHUB_ENV
-        echo "ARCHIVES_BASE_NAME=$archives_base_name" >> $GITHUB_ENV
-
-    - name: create tag
-      id: create_tag
-      run: |
-        tag_name="v${{ env.MOD_VERSION }}"
-        git tag $tag_name
-        git push origin $tag_name
-        echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
-
-    - name: create release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.TAG_NAME }}
-        release_name: ${{ env.ARCHIVES_BASE_NAME }} ${{ env.MOD_VERSION }}
-        draft: false
-        prerelease: false
-    
-    - name: upload release asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/libs/
-        asset_name: $(basename build/libs/)
-        asset_content_type: application/java-archive
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts
+          path: build/libs/
