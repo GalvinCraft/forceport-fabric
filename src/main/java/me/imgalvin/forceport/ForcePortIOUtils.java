@@ -1,6 +1,6 @@
 package me.imgalvin.forceport;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,12 +13,8 @@ public class ForcePortIOUtils {
 
     // Get the path to the Minecraft installation directory
     public static Path getMinecraftInstallationLocation() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) {
-            LOGGER.error("MinecraftClient instance is null. Cannot determine installation location.");
-            throw new IllegalStateException("MinecraftClient instance is null.");
-        }
-        return client.runDirectory.toPath();
+        Minecraft client = Minecraft.getInstance();
+        return client.gameDirectory.toPath();
     }
 
     // Create a configuration file with the default port
